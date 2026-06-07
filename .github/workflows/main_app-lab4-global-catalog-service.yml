@@ -25,13 +25,15 @@ jobs:
           distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean package "-Dquarkus.package.jar.type=uber-jar" "-DskipTests"
+        run: |
+          mvn clean package "-Dquarkus.package.jar.type=uber-jar" "-DskipTests"
+          Rename-Item -Path target/*-runner.jar -NewName app.jar
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*-runner.jar'
+          path: '${{ github.workspace }}/target/app.jar'
 
   deploy:
     runs-on: windows-latest
