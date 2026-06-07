@@ -117,7 +117,7 @@ public class ProductPersistenceAdapter implements ProductCatalogRepository {
             return;
         }
         try {
-            getContainer().createItem(toCosmosDocument(product), new PartitionKey(product.tenantCountry()), new CosmosItemRequestOptions());
+            getContainer().createItem(toCosmosDocument(product), new PartitionKey(product.productId()), new CosmosItemRequestOptions());
         } catch (CosmosException e) {
             if (e.getStatusCode() == 409) {
                 throw new ProductAlreadyExistsException("Product already exists");
