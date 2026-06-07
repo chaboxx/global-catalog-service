@@ -25,13 +25,13 @@ jobs:
           distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean package -Dquarkus.package.jar.type=uber-jar -DskipTests
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: '${{ github.workspace }}/target/*-runner.jar'
 
   deploy:
     runs-on: windows-latest
@@ -60,4 +60,3 @@ jobs:
           app-name: 'app-lab4-global-catalog-service'
           slot-name: 'Production'
           package: '*.jar'
-          
