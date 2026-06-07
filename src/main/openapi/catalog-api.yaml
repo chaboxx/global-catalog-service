@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: Mercado Andes Global Catalog API
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /api/products:
+    post:
+      tags:
+        - Products
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "201":
+          description: Product created.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/products/search:
+    get:
+      tags:
+        - Products
+      operationId: searchProducts
+      parameters:
+        - name: country
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Products matching the filters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /api/products/{country}/{productId}:
+    get:
+      tags:
+        - Products
+      operationId: getProduct
+      parameters:
+        - $ref: "#/components/parameters/Country"
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: Product details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Products
+      operationId: updateProduct
+      parameters:
+        - $ref: "#/components/parameters/Country"
+        - $ref: "#/components/parameters/ProductId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Updated product.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - Products
+      operationId: deleteProduct
+      parameters:
+        - $ref: "#/components/parameters/Country"
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "204":
+          description: Product deleted.
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/products/{country}/{productId}/price:
+    patch:
+      tags:
+        - Products
+      operationId: updatePrice
+      parameters:
+        - $ref: "#/components/parameters/Country"
+        - $ref: "#/components/parameters/ProductId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceUpdateRequest"
+      responses:
+        "200":
+          description: Product with updated price.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/products/{country}/{productId}/changes:
+    get:
+      tags:
+        - Products
+      operationId: getProductChanges
+      parameters:
+        - $ref: "#/components/parameters/Country"
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: Product change history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductChange"
+components:
+  parameters:
+    Country:
+      name: country
+      in: path
+      required: true
+      schema:
+        type: string
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - productId
+        - tenantCountry
+        - name
+        - category
+        - brand
+        - price
+        - currency
+        - stock
+        - status
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        tenantCountry:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        brand:
+          type: string
+        price:
+          type: number
+          format: double
+          minimum: 0
+        currency:
+          type: string
+        stock:
+          type: integer
+          format: int32
+          minimum: 0
+        status:
+          $ref: "#/components/schemas/ProductStatus"
+        lastUpdatedBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        schemaVersion:
+          type: string
+    ProductStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+    PriceUpdateRequest:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: number
+          format: double
+          minimum: 0
+        updatedBy:
+          type: string
+    ProductChange:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        tenantCountry:
+          type: string
+        changeType:
+          type: string
+        previousPrice:
+          type: number
+          format: double
+        currentPrice:
+          type: number
+          format: double
+        changedAt:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        traceId:
+          type: string

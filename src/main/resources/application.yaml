@@ -1,0 +1,16 @@
+cosmos:
+  endpoint: ${COSMOS_ENDPOINT:https://tu-cuenta.documents.azure.com:443/}
+  database: ${COSMOS_DATABASE:TiendaDB}
+  container: ${COSMOS_CONTAINER:Productos}
+  managed-identity-client-id: ${AZURE_CLIENT_ID:}
+
+mercadoandes:
+  catalog:
+    use-mock-storage: ${USE_MOCK_STORAGE:false}
+  predictor:
+    base-url: ${PREDICTOR_BASE_URL:http://127.0.0.1:5000}
+
+"%test":
+  mercadoandes:
+    catalog:
+      use-mock-storage: true
