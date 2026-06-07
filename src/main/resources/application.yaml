@@ -1,6 +1,6 @@
 quarkus:
   http:
-    port: ${HTTP_PLATFORM_PORT:8080}
+    port: ${server.port:${HTTP_PLATFORM_PORT:8080}}
 
 cosmos:
   endpoint: ${COSMOS_ENDPOINT:https://tu-cuenta.documents.azure.com:443/}
