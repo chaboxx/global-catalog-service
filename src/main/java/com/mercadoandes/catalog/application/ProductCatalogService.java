@@ -50,7 +50,8 @@ public class ProductCatalogService {
     }
 
     public Product get(String country, String productId) {
-        throw new ProductNotFoundException("Product not found");
+        return productRepository.findByCountryAndProductId(country, productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
     }
 
     @Transactional

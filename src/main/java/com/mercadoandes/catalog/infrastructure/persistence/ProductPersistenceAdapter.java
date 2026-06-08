@@ -98,7 +98,22 @@ public class ProductPersistenceAdapter implements ProductCatalogRepository {
 
     @Override
     public Optional<Product> findByCountryAndProductId(String country, String productId) {
-        return Optional.empty();
+        if (useMockStorage) {
+            String productKey = key(country, productId);
+            return Optional.ofNullable(mockStorage.get(productKey));
+        }
+        try {
+            ProductDocument doc = getContainer().readItem(productId, new PartitionKey(productId), ProductDocument.class).getItem();
+            if (doc != null && doc.getTenantCountry().equalsIgnoreCase(country)) {
+                return Optional.of(toDomain(doc));
+            }
+            return Optional.empty();
+        } catch (CosmosException e) {
+            if (e.getStatusCode() == 404) {
+                return Optional.empty();
+            }
+            throw e;
+        }
     }
 
     @Override
